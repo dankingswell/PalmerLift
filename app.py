@@ -7,6 +7,7 @@ import datetime
 
 
 app = Flask(__name__)
+db = SQLAlchemy(app)
 
 
 
@@ -22,8 +23,9 @@ def index():
 def register():
     pass
 
-
-
+@app.route("/createworkout",methods=["GET","POST"])
+def createworkout():
+    pass
 
 if __name__ == "__main__":
     app.run(debug=True)
