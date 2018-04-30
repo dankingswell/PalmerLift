@@ -10,8 +10,6 @@ app = Flask(__name__)
 
 
 
-
-
 @app.route("/login",methods=["GET","POST"])
 def login():
     pass
