@@ -1,4 +1,0 @@
-nav bar selected #004d70
-#696b98
-#b58bb2
- Bg = #2e2e2e

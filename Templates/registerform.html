@@ -1,0 +1,28 @@
+
+    {% extends "layout.html"%}
+    {% block body %}
+    <div class="jumbotron text-center">
+        <h1>Register</h1>
+        <p>Please enter your registration information below</p>
+
+    </div>
+    <form method="POST" action="/register">
+        <div >
+            <label>Email Address</label>
+            <input name="Email" type="email">
+
+            <label for="username">Username</label>
+            <input name="Username" type="text"/>
+    
+            <label for="password">Password</label>
+            <input name="Password" type="password"/>
+    
+            <label for="confirm-password">Confirm Password</label>
+            <input name="Confirm-password" type="password"/>
+    
+            <input type="submit">
+        </div>
+    
+    
+    </form>
+    {% endblock %}

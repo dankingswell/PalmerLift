@@ -1,0 +1,17 @@
+
+{% extends "layout.html"%}
+{% block body %}
+<form method="POST" action="/login">
+    <div >
+        <label for="username">Username</label>
+        <input name="username" type="text"/>
+
+        <label for="password">Password</label>
+        <input name="password" type="password"/>
+
+        <input type="submit" style="background-color:#004d70; border:none; margin-top:10px; border-radius:5px">
+    </div>
+
+
+</form>
+{% endblock %}
