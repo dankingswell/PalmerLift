@@ -32,11 +32,36 @@
 .topnav .icon {
     display: none;
 }
+
+#status{
+    float:right;
+    text-align: right;
+    padding:14px 35px;
+}
 </style>
 <div class="topnav" id="myTopnav">
         <a href="/" class="active">Home</a>
         <a href="/login">Login</a>
         <a href="#contact">Contact</a>
-        <a href="/register">Register</a>
         <a href="javascript:void(0);" class="icon" onclick="myFunction()">&#9776;</a>
+        <a href="/register" id="status">Register</a>
       </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", StatusValidation );
+
+    function StatusValidation(){
+        var req = new XMLHttpRequest();
+        
+        req.open("GET","/Status",true);
+        req.onload = function(){
+            console.log(req.response)
+            if(this.status == 200){
+                var nav = document.querySelector("#status")
+                nav.innerHTML  = req.responseText;
+                nav.setAttribute("href", "/profile")
+            }
+        }
+        req.send()
+    }
+</script>

@@ -11,18 +11,20 @@ def requireToken(func):
     def wrapper(*args,**kwargs):
         token = ""
         if not request.cookies.get("access_token"):
-            return make_response(redirect("/login"), jsonify({"Message":"Token expired or not avalible please login"}))
+            resp = make_response(redirect("/login"),401)
+            resp.headers["Message"] = "Token expired or not avalible please login"
+            return resp
         token = request.cookies.get("access_token")
 
         decoded =  security.CheckToken(token)
         if not decoded:
-            return jsonify({"Message" : "Token invalid"})
+            return make_response(redirect("/login"),401)
         print(decoded)
         UserSearch = Query.User.Get(headers="public_id", content=decoded["public_id"])
 
         if not UserSearch:
             return jsonify({"Message":"User not found, token invalid"})
-        return func(UserSearch,*args,**kwargs)
+        return func(UserSearch["Row 0"],*args,**kwargs)
     return wrapper
 
 
@@ -36,18 +38,28 @@ def login():
         form = request.form
 
         if not form["username"] or not form["password"]:
-            return jsonify({"Message":"Missing Fields please complete form"})
+            resp = make_response(redirect("/login"))
+            resp.headers["Message"] = "Missing Fields please complete form"
+            resp = security.InvalidateToken(resp)
+            return resp
         
         userFromDB = Query.User.Get(headers="username" ,content=form["username"])
 
         if not userFromDB:
-            return jsonify({"Message": "User not found."})
+            resp = make_response(redirect("/login"))
+            resp.headers["Message"] = "User not found."
+            resp = security.InvalidateToken(resp)
+            return resp
         
         userFromDB = userFromDB["Row 0"]
 
 
         if not security.CheckPassword(form["password"],userFromDB["password"]):
-            return jsonify({"Message":"Password incorrect please enter a valid password"})
+            resp = make_response(redirect("/login"))
+            resp.headers["Message"] = "Password incorrect please enter a valid password"
+            resp = security.InvalidateToken(resp)
+            return resp
+            
 
         resp = make_response(redirect("/"))
         resp.set_cookie("access_token", value=security.MakeToken(userFromDB))
@@ -119,3 +131,12 @@ def testq(ActiveUser):
     result = Query.User.Get(columns="*")
     print(result)
     return jsonify({"message":result})
+
+
+@app.route("/Status")
+@requireToken
+def status(ActiveUser):
+    if ActiveUser["username"]:
+        return ActiveUser["username"], 200
+    
+    return None
