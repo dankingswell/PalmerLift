@@ -1,21 +1,33 @@
 
-
-        .topnav{
+    html,body{
+        background: #4B79A1;  /* fallback for old browsers */
+        background: -webkit-linear-gradient(to right, #283E51, #4B79A1);  /* Chrome 10-25, Safari 5.1-6 */
+        background: linear-gradient(to right, #283E51, #4B79A1); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+        color:#191b1d;
+    }
+    .topnav{
             margin-bottom:5%;
         }
      form div {
         display:flex; 
         flex-direction:column; 
         max-width: 30%; 
-        color: white; 
         margin:auto;
      }
-     div .jumbotron, .jumbotron p{
-        background-color:#985179;
-        color:#2e2e2e;
+     .container{
+        
+        padding:5px 35px 5px 35px
+        
+     }
+
+    .container{
+        height:85vh;
+        width: 85vw;
+        max-width: 85vw;
+        
      }
      label{
-         color:#985179;
+         margin-top:3%;
      }
      form div input{
          padding:4px;
@@ -33,5 +45,8 @@
         margin-top:10px; 
         border-radius:10px;
         color:#2e2e2e;
+     }
+     html h1,h2,h3,h4, body {
+        color:#191b1d;
      }
  

@@ -33,7 +33,7 @@
     display: none;
 }
 
-#status{
+#status,body .Track{
     float:right;
     text-align: right;
     padding:14px 35px;
@@ -42,24 +42,48 @@
 <div class="topnav" id="myTopnav">
         <a href="/" class="active">Home</a>
         <a href="/login">Login</a>
-        <a href="#contact">Contact</a>
+        <a href="/contact">Contact</a>
         <a href="javascript:void(0);" class="icon" onclick="myFunction()">&#9776;</a>
         <a href="/register" id="status">Register</a>
       </div>
 
 <script>
+    var NavElementsToAdd = ["Workouts","Progression","Goals"]
+    
     document.addEventListener("DOMContentLoaded", StatusValidation );
 
     function StatusValidation(){
         var req = new XMLHttpRequest();
         
         req.open("GET","/Status",true);
+        req.onerror=function(){
+            console.log("no token")
+        }
         req.onload = function(){
             console.log(req.response)
             if(this.status == 200){
                 var nav = document.querySelector("#status")
                 nav.innerHTML  = req.responseText;
                 nav.setAttribute("href", "/profile")
+
+                var home =  document.querySelector('a[href="/"]')
+                home.innerHTML = "Track"
+                home.setAttribute("href", "/track")
+
+
+                document.querySelector('a[href="/login"]').remove()
+                document.querySelector('a[href="/contact"]').remove()
+                
+
+                var topnav  = document.querySelector(".topnav")
+                
+                for(var i = 0; i < NavElementsToAdd.length; i ++){
+                newNavItem = topnav.insertBefore(document.createElement("a"),nav)
+                newNavItem.innerHTML = NavElementsToAdd[i];
+                newNavItem.setAttribute("href","/"+NavElementsToAdd[i].toLowerCase() )
+                newNavItem.classList.add(NavElementsToAdd[i])
+
+                }
             }
         }
         req.send()

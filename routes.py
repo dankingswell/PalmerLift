@@ -11,21 +11,25 @@ def requireToken(func):
     def wrapper(*args,**kwargs):
         token = ""
         if not request.cookies.get("access_token"):
-            resp = make_response(redirect("/login"),401)
+            resp = make_response(redirect("/login"),400)
             resp.headers["Message"] = "Token expired or not avalible please login"
             return resp
+
         token = request.cookies.get("access_token")
 
         decoded =  security.CheckToken(token)
         if not decoded:
-            return make_response(redirect("/login"),401)
-        print(decoded)
+            resp = make_response(redirect("/login",400))
+            resp.headers["Message"] = "Token expired or is invalid please login"
+            return resp
+
         UserSearch = Query.User.Get(headers="public_id", content=decoded["public_id"])
 
         if not UserSearch:
             return jsonify({"Message":"User not found, token invalid"})
         return func(UserSearch["Row 0"],*args,**kwargs)
     return wrapper
+
 
 
 @app.route("/login",methods=["GET","POST"])
@@ -61,11 +65,11 @@ def login():
             return resp
             
 
-        resp = make_response(redirect("/"))
+        resp = make_response(redirect("/profile"))
         resp.set_cookie("access_token", value=security.MakeToken(userFromDB))
         
         return resp
-        
+
 
 
 @app.route("/",methods=["GET"])
@@ -110,9 +114,44 @@ def register():
 
         
 
-@app.route("/createworkout",methods=["GET","POST"])
-def createworkout():
+@app.route("/workouts",methods=["GET","POST"])
+def workouts():
+    if request.method == "GET":
+        return render_template("workouts.html")
     pass
+
+@app.route("/goals",methods=["GET","POST"])
+@requireToken
+def goals(ActiveUser):
+    if request.method == "GET":
+        goals= {
+            "1":"icons8-biceps.png",
+            "2":"icons8-barbell.png",
+            "3":"icons8-bodybuilder.png",
+            "4":"icons8-fitness.png",
+            "5":"icons8-jumping-rope.png"
+        }
+        return render_template("goals.html",goals=goals)
+    pass
+
+@app.route("/progression",methods=["GET","POST"])
+def progression():
+    if request.method == "GET":
+        return render_template("progression.html")
+    pass
+
+
+
+@app.route("/profile")
+@requireToken
+def profile(ActiveUser):
+    print(ActiveUser)
+    user_info = {
+        "username" : ActiveUser.get("username"),
+        "email":ActiveUser.get("email")
+    }
+    return render_template("profile.html",user=user_info)
+
 
 @app.route("/testinsert")
 def testi():
