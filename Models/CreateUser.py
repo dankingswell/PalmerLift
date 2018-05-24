@@ -16,21 +16,26 @@
 # connection.close()
 
 import psycopg2
+from psycopg2 import extras
 
 connection  =  psycopg2.connect(host='localhost', user='PalmerstonAdmin'  , password='Admin', dbname='Palmerswole')
+connection.autocommit = True
 print(connection)
-cursor  =  connection.cursor()
-print(cursor)
-#cursor.execute("CREATE TABLE IF NOT EXISTS Users (id serial Primary Key,public_id varchar(60) unique not null, username varchar(50) not null unique, password varchar(50), email varchar(50) not null unique, admin boolean)")
+cursor  =  connection.cursor(cursor_factory =extras.RealDictCursor)
+# print(type(cursor))
 
-#cursor.execute("""insert into Users (public_id , username, password, email, admin)
-#values ('1111_2222_3333_4444', 'admin','admin','admin@palmerswole.com', 'false' );""")
 
-cursor.execute("select * from users")
-x= cursor.fetchall()
-print(type(x))
-for a in x:
-    print(a)
+# #cursor.execute("CREATE TABLE IF NOT EXISTS Users (id serial Primary Key,public_id varchar(60) unique not null, username varchar(50) not null unique, password varchar(50), email varchar(50) not null unique, admin boolean)")
+
+# #cursor.execute("""insert into Users (public_id , username, password, email, admin)
+# #values ('1111_2222_3333_4444', 'admin','admin','admin@palmerswole.com', 'false' );""")
+
+
+# cursor.execute("select * from users")
+# x= cursor.fetchall()
+# print(type(x[0]))
+# for a in x:
+#     print(a["id"])
 
 
 connection.commit()

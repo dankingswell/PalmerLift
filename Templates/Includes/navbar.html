@@ -48,6 +48,8 @@
       </div>
 
 <script>
+    var topnav  = document.querySelector(".topnav")
+    
     var NavElementsToAdd = ["Workouts","Progression","Goals"]
     
     document.addEventListener("DOMContentLoaded", StatusValidation );
@@ -75,7 +77,7 @@
                 document.querySelector('a[href="/contact"]').remove()
                 
 
-                var topnav  = document.querySelector(".topnav")
+                
                 
                 for(var i = 0; i < NavElementsToAdd.length; i ++){
                 newNavItem = topnav.insertBefore(document.createElement("a"),nav)

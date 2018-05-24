@@ -103,7 +103,7 @@ def register():
             "Email": form["Email"],
         }
 
-        print(user_to_insert.values())
+        print("user to insert ",user_to_insert.values())
 
         to_insert = ",".join([x for x in user_to_insert.values()])
 
