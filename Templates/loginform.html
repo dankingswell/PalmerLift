@@ -1,10 +1,15 @@
 <style> 
-    h1{text-align:center;
+    h1,h3{text-align:center;
     padding:3%;}
+    .container h3{
+        font-size: small;
+        color:white;
+    }
 </style>
 {% extends "layout.html"%}
 {% block body %}
 <h1>Login</h1>
+
 <form method="POST" action="/login">
     <div >
         <label for="username">Username</label>
@@ -18,4 +23,9 @@
 
 
 </form>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <h3>{{ messages[0] }}</h3>
+    {% endif %}
+{% endwith %}
 {% endblock %}

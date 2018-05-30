@@ -1,4 +1,4 @@
-from flask import Flask , request, make_response, jsonify,url_for,render_template,redirect
+from flask import Flask , request, make_response, jsonify,url_for,render_template,redirect,flash
 from app import app
 import security
 from Models.QueryTool import Query
@@ -11,7 +11,7 @@ def requireToken(func):
     def wrapper(*args,**kwargs):
         token = ""
         if not request.cookies.get("access_token"):
-            resp = make_response(redirect("/login"),400)
+            resp = redirect(url_for("login"),200)
             resp.headers["Message"] = "Token expired or not avalible please login"
             return resp
 
@@ -19,7 +19,7 @@ def requireToken(func):
 
         decoded =  security.CheckToken(token)
         if not decoded:
-            resp = make_response(redirect("/login",400))
+            resp = redirect("/login")
             resp.headers["Message"] = "Token expired or is invalid please login"
             return resp
 
@@ -43,16 +43,18 @@ def login():
 
         if not form["username"] or not form["password"]:
             resp = make_response(redirect("/login"))
-            resp.headers["Message"] = "Missing Fields please complete form"
+            resp.headers["Message"] = "Please ensure all fields are completed"
             resp = security.InvalidateToken(resp)
+            flash(flash(resp.headers["Message"]))
             return resp
         
         userFromDB = Query.User.Get(headers="username" ,content=form["username"])
 
         if not userFromDB:
             resp = make_response(redirect("/login"))
-            resp.headers["Message"] = "User not found."
+            resp.headers["Message"] = "User not found with those credentials, please check and resubmit your login information"
             resp = security.InvalidateToken(resp)
+            flash(resp.headers["Message"])
             return resp
         
         userFromDB = userFromDB["Row 0"]
@@ -60,8 +62,9 @@ def login():
 
         if not security.CheckPassword(form["password"],userFromDB["password"]):
             resp = make_response(redirect("/login"))
-            resp.headers["Message"] = "Password incorrect please enter a valid password"
+            resp.headers["Message"] = "User not found with those credentials, please check and resubmit your login information"
             resp = security.InvalidateToken(resp)
+            flash(resp.headers["Message"])
             return resp
             
 
@@ -115,11 +118,36 @@ def register():
         
 
 @app.route("/workouts",methods=["GET","POST"])
-def workouts():
+@requireToken
+def workouts(ActiveUser):
     if request.method == "GET":
         return render_template("workouts.html")
-    pass
 
+    if request.method == "POST":
+        data = request.get_json()
+        print(data)
+        return render_template("workouts.html")
+
+
+    # exercises will be sent as JSON object in format:
+    # workout:{
+    #       exercise : {
+    #           name:name,
+    #           sets:amount, 
+    #           set1:{
+    #                    "Reps": x , weight: n 
+    #                 },
+    #           set2:{
+    #                    "Reps": x , weight: n 
+    #                 }
+    #               }
+    #          }
+
+
+
+
+
+## MAKE GOALS DB
 @app.route("/goals",methods=["GET","POST"])
 @requireToken
 def goals(ActiveUser):
@@ -153,29 +181,29 @@ def profile(ActiveUser):
     return render_template("profile.html",user=user_info)
 
 
-@app.route("/testinsert")
-def testi():
-    query = Query
-    print(query)
-    result = Query.User.Insert(content="UUID5,admin3,12345,admin5@palmerswole.com")
-    print(result)
-    return jsonify({"message":result})
+# @app.route("/testinsert")
+# def testi():
+#     query = Query
+#     print(query)
+#     result = Query.User.Insert(content="UUID5,admin3,12345,admin5@palmerswole.com")
+#     print(result)
+#     return jsonify({"message":result})
 
 
-@app.route("/testquery")
-@requireToken
-def testq(ActiveUser):
-    query = Query()
-    print(query)
-    result = Query.User.Get(columns="*")
-    print(result)
-    return jsonify({"message":result})
+# @app.route("/testquery")
+# @requireToken
+# def testq(ActiveUser):
+#     query = Query()
+#     print(query)
+#     result = Query.User.Get(columns="*")
+#     print(result)
+#     return jsonify({"message":result})
 
 
 @app.route("/Status")
 @requireToken
 def status(ActiveUser):
     if ActiveUser["username"]:
-        return ActiveUser["username"], 200
+        return ActiveUser["username"], 202
     
     return None

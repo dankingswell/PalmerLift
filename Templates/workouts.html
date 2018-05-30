@@ -1,7 +1,244 @@
+<style>
+    .set_collection div input{
+        margin:3px;
+        padding:1px
+    }
+    .set_collection div{
+        margin:0;
+        display: flex;
+
+    }
+    label{
+    
+        width:100%;
+    }
+    .container{
+        overflow:auto;
+    }
+    .WorkoutButtons{
+        display:flex;
+        flex-direction:right;
+        justify-content:space-around;
+    }
+
+</style>
+
 {% extends "layout.html" %}
 
 {% block body %}
 
+<div class="exercise">
+    <h3 class="exercise_name">Bench</h3>
+    <label for="sets" class='setsLabel"'>Sets <span>1</span></label>
+    <input name="sets" type="range" value="1" min="1" max="10" onchange="SliderChange(this)" />
+        <div class="set_collection">
+            <div class="set0">
+                <input type="text" name="reps">
+                <input type="text" name="weight">
+            </div>
+        </div>
+        
+</div>
+
+<div class="exercise">
+        <h3 class="exercise_name">Squats</h3>
+        <label for="sets" class='setsLabel"'>Sets <span>1</span></label>
+        <input name="sets" type="range" value="1" min="1" max="10" onchange="SliderChange(this)" />
+            <div class="set_collection">
+                <div class="set0">
+                    <input type="text" name="reps">
+                    <input type="text" name="weight">
+                </div>
+            </div>
+            
+    </div>
+    <div class="exercise">
+            <h3 class="exercise_name">Curls</h3>
+            <label for="sets" class='setsLabel"'>Sets <span>1</span></label>
+            <input name="sets" type="range" value="1" min="1" max="10" onchange="SliderChange(this)" />
+                <div class="set_collection">
+                    <div class="set0">
+                        <input type="text" name="reps">
+                        <input type="text" name="weight">
+                    </div>
+                </div>
+                
+        </div>
+
+<div class="WorkoutButtons">
+    <button class="AddExercise btn " >Add Exercise</button>
+    <button class="button btn btn-success sendJson">Save workout</button>
+</div>
+
+<br style="margin:10vh;"/>
+
+<script >
+    
+
+    document.querySelector(".sendJson").addEventListener("click",PostExercises)
+
+        function PostExercises(){
+        var req =  new XMLHttpRequest()
+        req.addEventListener("load", transferComplete);
+        req.open("POST","/workouts");
+        req.setRequestHeader("Content-Type", "application/json");
+        req.send(JSON.stringify({"workout":JsonCompiler()}))
+
+        function transferComplete(){
+            alert("Success")
+        }
+    }
 
 
+    function JsonCompiler(){
+        var exercises = document.querySelectorAll(".exercise")
+        var workout = {};
+
+        for(var i = 0; i < exercises.length;i++){
+
+            var exercise = {};
+          
+            exercise.name = exercises[i].children[0].innerHTML
+            exercise.sets= exercises[i].children[2].value
+            
+            var setsCollection = exercises[i].children[3].children
+
+            for(var n = 0; n < setsCollection.length; n++){
+                name = setsCollection[n].className
+                reps = setsCollection[n].children[0].value
+                weight = setsCollection[n].children[1].value
+
+                exercise["set " + n] = {
+                    "reps" : reps,
+                    "weight" : weight 
+                }
+
+            }
+
+            workout["Exercise " + i] = exercise;
+
+
+        }
+        
+        return workout
+    }
+    
+    function SliderChange(element){
+        
+        label = element.parentNode.children[1].children[0]
+        label.innerHTML = element.value
+        Collection = element.parentNode.children[3]
+        
+
+        function MakeInputs(){
+            previousElement = Collection.children[i]
+
+            LiftFields = document.createElement("div")
+            repElement = document.createElement("input")
+            repElement.setAttribute("name","reps")
+            repElement.setAttribute("type","text")
+            repElement.setAttribute("value",previousElement.children[0].value)
+            
+            weightElement = document.createElement("input")
+            weightElement.setAttribute("name","weight")
+            weightElement.setAttribute("type","text")
+            weightElement.setAttribute("value",previousElement.children[1].value)
+
+            LiftFields.appendChild(repElement)
+            LiftFields.appendChild(weightElement)
+
+            LiftFields.className = "set"+Collection.children.length;
+            Collection.appendChild(LiftFields)
+        }
+
+        if (Collection.children.length < element.value){
+            times= element.value - Collection.children.length
+            for(var i = 0; i < times  ;i++){
+                MakeInputs()
+            }
+        }else if(Collection.children.length > element.value){
+            times= Collection.children.length - element.value
+            for(var i=0; i < times ; i++ ){
+            Collection.removeChild(Collection.lastChild)
+            }
+
+        }
+    }
+
+
+/*
+<div class="exercise">
+    <h3 class="exercise_name">Bench</h3>
+    <label for="sets" class='setsLabel"'>Sets <span>1</span></label>
+    <input name="sets" type="range" value="1" min="1" max="10" onchange="SliderChange(this)" />
+        <div class="set_collection">
+            <div class="set0">
+                <input type="text" name="reps">
+                <input type="text" name="weight">
+            </div>
+        </div>
+        
+</div>
+*/
+
+document.querySelector(".AddExercise").addEventListener("click",AddExercise)
+
+function AddExercise(){
+    container = document.querySelector(".container")
+    container.insertBefore(CreateExercise("lift"),document.querySelector(".WorkoutButtons"))
+}
+
+function CreateExercise(type){
+    if(type == "lift"){
+        ExerciseContainer = document.createElement("div")
+        ExerciseContainer.className = "exercise"
+
+        Header = document.createElement("h3")
+        Header.innerHTML = "Click To Edit Name"
+
+        Label = document.createElement("label")
+        Label.innerHTML = "Sets "
+        LabelSpan = document.createElement("span")
+        LabelSpan.innerHTML="1"
+        Label.appendChild(LabelSpan)
+
+        Slider = document.createElement("input")
+        Slider.setAttribute("name","sets")
+        Slider.setAttribute("type","range")
+        Slider.setAttribute("value",1)
+        Slider.setAttribute("min",1)
+        Slider.setAttribute("max","10")
+        Slider.setAttribute("onchange","SliderChange(this)")
+
+        setsCollection = document.createElement("div")
+        setsCollection.className = "set_collection";
+
+        initalset = document.createElement("div")
+        initalset.className = "set0"
+
+        repsInput = document.createElement("input")
+        repsInput.setAttribute("name","reps")
+        repsInput.setAttribute("type","text")
+
+        weightInput = document.createElement("input")
+        weightInput.setAttribute("name","weight")
+        weightInput.setAttribute("type","text")
+
+        initalset.appendChild(repsInput)
+        initalset.appendChild(weightInput)
+
+        setsCollection.appendChild(initalset)
+
+        ExerciseContainer.appendChild(Header)
+        ExerciseContainer.appendChild(Label)
+        ExerciseContainer.appendChild(Slider)
+        ExerciseContainer.appendChild(setsCollection)
+
+        return ExerciseContainer;
+    }
+
+}
+    
+
+</script>
 {% endblock%}

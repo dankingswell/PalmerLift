@@ -3,7 +3,13 @@
 .topnav {
     background-color: #333;
     overflow: hidden;
+    display:hidden;
+    opacity:1;
+    transition: opacity linear 0.25s;
 }
+
+
+
 
 /* Style the links inside the navigation bar */
 .topnav a {
@@ -33,6 +39,8 @@
     display: none;
 }
 
+
+
 #status,body .Track{
     float:right;
     text-align: right;
@@ -40,17 +48,44 @@
 }
 </style>
 <div class="topnav" id="myTopnav">
-        <a href="/" class="active">Home</a>
-        <a href="/login">Login</a>
-        <a href="/contact">Contact</a>
+        <a href="/" class="active"></a>
+        <a href="/login"></a>
+        <a href="/contact"></a>
         <a href="javascript:void(0);" class="icon" onclick="myFunction()">&#9776;</a>
         <a href="/register" id="status">Register</a>
       </div>
 
 <script>
+    
     var topnav  = document.querySelector(".topnav")
     
+    // click on nav link
+    document.querySelector(".topnav").addEventListener('click',function(event){
+        
+        link = event.target
+        href= link.getAttribute("href")
+        if(link.tagName ==  "A"){
+
+            
+            event.preventDefault()
+
+            fadebody = document.querySelector(".container")
+            fadebody.style.opacity=0;
+
+            
+            window.setInterval(function(){
+                window.location = href;
+            },200)
+            
+
+            
+        }
+
+    })
+
+    
     var NavElementsToAdd = ["Workouts","Progression","Goals"]
+    
     
     document.addEventListener("DOMContentLoaded", StatusValidation );
 
@@ -58,12 +93,10 @@
         var req = new XMLHttpRequest();
         
         req.open("GET","/Status",true);
-        req.onerror=function(){
-            console.log("no token")
-        }
+       
         req.onload = function(){
             console.log(req.response)
-            if(this.status == 200){
+            if(this.status == 202){
                 var nav = document.querySelector("#status")
                 nav.innerHTML  = req.responseText;
                 nav.setAttribute("href", "/profile")
@@ -86,8 +119,18 @@
                 newNavItem.classList.add(NavElementsToAdd[i])
 
                 }
+                topnav.setAttribute("display","block")
+            }
+            else{
+                document.querySelector('a[href="/"]').innerHTML= "Home"
+                document.querySelector('a[href="/login"]').innerHTML= "Login"
+                document.querySelector('a[href="/contact"]').innerHTML= "Contact"
+                document.querySelector("#status").innerHTML= "Register"
+                topnav.setAttribute("display","block")
             }
         }
         req.send()
     }
+
+    
 </script>
